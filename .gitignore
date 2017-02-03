@@ -2,6 +2,6 @@
 */obj/
 */Properties/
 packages/
-*/.vs/
+.vs/
 *.xcf
 
