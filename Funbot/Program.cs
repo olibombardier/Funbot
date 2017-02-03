@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using Discord.Commands;
+using DSLib.DiscordCommands;
 using System.Timers;
+using System.Threading.Tasks;
 
 namespace Funbot
 {
@@ -15,14 +16,15 @@ namespace Funbot
         static void Main(string[] args)
         {
             Bot bot = Bot.botInstance;
+            ImageGenerator img = new ImageGenerator();
             string input = "as";
 
-            bot.CreateCommandsFromClass(typeof(Questions));
-            bot.CreateCommandsFromClass(typeof(ImageGenerator));
-            bot.CreateCommandsFromClass(typeof(Program));
-            bot.CreateCommandsFromClass(typeof(ServerManagement));
+            bot.commandService.AddCommands(typeof(Questions), null);
+            bot.commandService.AddCommands(typeof(ImageGenerator), img);
+            bot.commandService.AddCommands(typeof(Program), null);
+            bot.commandService.AddCommands(typeof(ServerManagement), null);
 
-            bot.DiscorClient.Ready += DiscorClient_Ready;
+            bot.DiscordClient.Ready += DiscorClient_Ready;
 
             LoadGamesName("gamelist.txt");
 
@@ -77,19 +79,18 @@ namespace Funbot
 
         private static void GameTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Bot.botInstance.DiscorClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
+            Bot.botInstance.DiscordClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
         }
 
         private static void DiscorClient_Ready(object sender, EventArgs e)
         {
-            Bot.botInstance.DiscorClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
+            Bot.botInstance.DiscordClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
         }
 
-        [Command("easteregg", "")]
-        [Hidden]
-        static void EasterEgg(CommandEventArgs args)
+        [Command("easteregg")]
+        static async Task EasterEgg(CommandEventArgs args)
         {
-            args.Channel.SendMessage("Wow! T'as trouvé un easter egg!!!\nC'est dont ben cool!\nUn easter egg!\nUN EASTER EGG!!!!!\nWOOOOOOOOOOOOOOOOOOOOOOOOOW!!!!!");
+            await args.User.PrivateChannel.SendMessage("Wow! T'as trouvé un easter egg!!!\nC'est dont ben cool!\nUn easter egg!\nUN EASTER EGG!!!!!\nWOOOOOOOOOOOOOOOOOOOOOOOOOW!!!!!");
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("{0} à trouvé l'easter egg", args.User.Name);
             Console.ResetColor();

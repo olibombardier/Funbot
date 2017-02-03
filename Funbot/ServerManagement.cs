@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Discord;
-using Discord.Commands;
+using DSLib.DiscordCommands;
 
 namespace Funbot
 {
@@ -13,9 +13,10 @@ namespace Funbot
     {
         static readonly string[] colorRoles = { "red", "orange", "yellow", "green", "blue", "purple", "cyan" };
 
-        [Command("couleur", "Change ta couleur dans le serveur \"Bomb Power\".", "color")]
-        [Parameter("colorname", ParameterType.Required)]
-        static async void Color(CommandEventArgs args)
+        [Command("couleur", "color")]
+        [CommandHelp("Change ta couleur dans le serveur \"Bomb Power\".","Usage: !couleur [couleur]")]
+        [CommandParam(0, "colorname")]
+        static async Task Color(CommandEventArgs args)
         {
             User user = args.User;
             string colorName = args.GetArg("colorname").ToLower();
@@ -30,7 +31,7 @@ namespace Funbot
                 {
                     if (r.Name.ToLower() == colorName)
                     {
-                        await Bot.botInstance.DiscorClient.GetServer(args.Server.Id).GetUser(user.Id).AddRoles(r);
+                        await Bot.botInstance.DiscordClient.GetServer(args.Server.Id).GetUser(user.Id).AddRoles(r);
                     }
                 }
             }

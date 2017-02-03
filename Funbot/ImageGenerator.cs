@@ -9,7 +9,7 @@ using System.Drawing.Imaging;
 using System.IO;
 
 using Discord;
-using Discord.Commands;
+using DSLib.DiscordCommands;
 
 namespace Funbot
 {
@@ -90,20 +90,21 @@ namespace Funbot
             return Image.FromStream(new MemoryStream(data));
         }
 
-        [Command("vs", "Génère un image cool de toi et ton opposant")]
-        [Parameter("other", ParameterType.Required)]
-        public void genereateVsImage(CommandEventArgs args)
+        [Command("vs")]
+        [CommandHelp("Génère un image cool de toi et ton opposant","Ajoutez une mention à un personne pour qu'une image vs soit créée")]
+        [CommandParam(0, "other")]
+        public async Task genereateVsImage(CommandEventArgs args)
         {
             ulong otherId = 0;
             if (Bot.TryGetIdFromMention(args.GetArg("other"), ref otherId))
             {
-                args.Channel.SendIsTyping();
+                await args.Channel.SendIsTyping();
                 User other = args.Channel.GetUser(otherId);
-                args.Channel.SendFile(args.User.Name + "vs" + other.Name + ".png", GenerateVs2Image(args.User, other));
+                await args.Channel.SendFile(args.User.Name + "vs" + other.Name + ".png", GenerateVs2Image(args.User, other));
             }
             else
             {
-                args.Channel.SendMessage("Utilisateur invalide.");
+                await args.Channel.SendMessage("Utilisateur invalide.");
             }
         }
     }
