@@ -21,7 +21,11 @@ namespace Funbot
             User user = args.User;
             string colorName = args.GetArg("colorname").ToLower();
 
-            if (colorRoles.Contains(colorName))
+            if (args.Channel.IsPrivate)
+            {
+                await args.Channel.SendMessage("Impossible de changer la couleur dans une cenversation privée.");
+            }
+            else if (colorRoles.Contains(colorName))
             {
                 await user.RemoveRoles(getUserColorRoles(user));
 

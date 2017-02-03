@@ -11,7 +11,7 @@ namespace Funbot
     {
         static string[] gamesList = {"chercher quoi faire"};
 
-        private static Timer gameTimer = new Timer(10 * 60000);
+        private static Timer gameTimer = new Timer(45 * 60000);
 
         static void Main(string[] args)
         {
