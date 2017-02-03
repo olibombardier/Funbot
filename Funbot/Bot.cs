@@ -20,8 +20,6 @@ namespace Funbot
 
         private List<CommandHelp> commandHelp = new List<CommandHelp>();
 
-        private Dictionary<ulong, Person> users = new Dictionary<ulong, Person>();
-
         private static readonly string[] answerHello = { "Salut!", "Hello!", "Coucou!", "Hey!", "Hello!", "Yo!", "Hello! :smile:" };
         private static readonly string[] answerBye = { "Bye!", "Au revoir!", "À la procahine!", "Bye bye!" };
 
@@ -121,83 +119,6 @@ namespace Funbot
             }
         }
 
-        public void LoadPeople(string filename)
-        {
-            if (File.Exists(filename))
-            {
-                try
-                {
-                    using (BinaryReader reader = new BinaryReader(File.Open(filename, FileMode.Open)))
-                    {
-                        int personCount = reader.ReadInt32();
-                        for (int i = 0; i < personCount; i++)
-                        {
-                            Person newPerson = Person.Read(reader);
-                            users.Add(newPerson.Id, newPerson);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Une erreur est survenue à la lecture des usagers: " + e.Message);
-                    Console.WriteLine("Il est possible que la liste d'usagers soit corrompue ou imcomplète.");
-                    Console.ResetColor();
-                }
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Impossible de charger les usagers à partir du fichier \"" + filename + "\" car il n'existe pas!");
-                Console.ResetColor();
-            }
-        }
-
-        public void SavePoeple(string filename)
-        {
-            try
-            {
-                using (BinaryWriter writer = new BinaryWriter(File.Open(filename, FileMode.Create)))
-                {
-                    writer.Write(users.Count);
-
-                    foreach (KeyValuePair<ulong, Person> p in users)
-                    {
-                        p.Value.Save(writer);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Une erreur est survenue à l'écriture lecture des usagers: " + e.Message);
-                Console.WriteLine("Il est possible que la liste d'usagers soit corrompue ou imcomplète.");
-                Console.ResetColor();
-            }
-        }
-
-        public void SetUserMoney(ulong Id, long value)
-        {
-            if (!users.ContainsKey(Id))
-            {
-                users[Id] = new Person() { Id = Id, Money = 0 };
-            }
-
-            users[Id].Money = value;
-        }
-
-        public long GetUserMoney(ulong Id)
-        {
-            if (!users.ContainsKey(Id))
-            {
-                return 0;
-            }
-            else
-            {
-                return users[Id].Money;
-            }
-        }
-
         [Command("help", "Affiche la liste des commandes disponnible ainsi que leurs instructions", "aide")]
         public void Help(CommandEventArgs args)
         {
@@ -250,94 +171,6 @@ namespace Funbot
         static void Bye(CommandEventArgs args)
         {
             args.Channel.SendMessage(answerBye[rand.Next(answerBye.Length)]);
-        }
-
-        [Command("money", "Affiche combien un utilisateur à d'argent")]
-        [Parameter("user", ParameterType.Optional)]
-        public void Money(CommandEventArgs args)
-        {
-            User user = null;
-            string userArg = args.GetArg("user");
-            if (args.GetArg("user") == "")
-            {
-                user = args.User;
-            }
-            else
-            {
-                if (userArg[0] == '<' && userArg[1] == '@' && userArg.EndsWith(">"))
-                {
-                    string idString = userArg.Substring(2, userArg.Length - 3);
-                    ulong id;
-
-                    if (ulong.TryParse(idString, out id))
-                    {
-                        user = args.Channel.GetUser(id);
-                    }
-                    else
-                    {
-                        args.Channel.SendMessage("Cette personnes à: " + GetUserMoney(id) + "$.");
-                    }
-                }
-                else
-                {
-                    args.Channel.SendMessage("Utilisateur invalide");
-                }
-            }
-
-            if (user != null)
-            {
-                args.Channel.SendMessage(user.Name + " à " + GetUserMoney(user.Id) + "$.");
-            }
-        }
-
-        [Command("setmoney", "Permet de spécifier le montant possédé pas un usager. Disponnible pour faire des test")]
-        [Parameter("Value", ParameterType.Required)]
-        [Parameter("user", ParameterType.Optional)]
-        public void SetMoney(CommandEventArgs args)
-        {
-            User user = null;
-            string userArg = args.GetArg("user");
-            long value;
-
-            if (long.TryParse(args.GetArg("Value"), out value))
-            {
-                //trouver l'utilisateur
-                if (args.GetArg("user") == "")
-                {
-                    user = args.User;
-                }
-                else
-                {
-                    ulong id = 0;
-                    if (TryGetIdFromMention(userArg, ref id))
-                    {
-                        string idString = userArg.Substring(2, userArg.Length - 3);
-
-                        user = args.Channel.GetUser(id);
-
-                        if(user == null)
-                        {
-                            SetUserMoney(id, value);
-                            args.Channel.SendMessage("Cette personne à maintenant " + GetUserMoney(user.Id) + "$!");
-                        }
-                    }
-                    else
-                    {
-                        args.Channel.SendMessage("Utilisateur invalide");
-                    }
-                }
-
-                if (user != null)
-                {
-                    SetUserMoney(user.Id, value);
-                    args.Channel.SendMessage(user.Name + " à maintenant " + GetUserMoney(user.Id) + "$!");
-                }
-                
-            }
-            else
-            {
-                args.Channel.SendMessage("Veuillez entrez un entier valide.");
-            }
         }
 
         public void SetGame(string gameName)

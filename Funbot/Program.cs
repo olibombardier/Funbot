@@ -29,9 +29,6 @@ namespace Funbot
             gameTimer.AutoReset = true;
             gameTimer.Elapsed += GameTimer_Elapsed;
 
-            Console.WriteLine("Lecture des personnes");
-            bot.LoadPeople("database.bin");
-
             Console.WriteLine("Connexion...");
             Console.CursorTop--;
             bot.Connect();
@@ -56,9 +53,6 @@ namespace Funbot
 
             bot.Disconnect();
             Console.WriteLine("Fun Bot déconnecté");
-
-            Console.WriteLine("Sauvegarde des personnes");
-            bot.SavePoeple("database.bin");
         }
 
         private static void LoadGamesName(string filename)
