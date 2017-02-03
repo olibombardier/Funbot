@@ -1,67 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Discord;
 using Discord.Commands;
+using System.Timers;
 
 namespace Funbot
 {
     class Program
     {
-        static readonly string[] gamesList =
-        {
-            "exister",
-            "être un vrai petit garçon",
-            "mettre de la couleur dans la vie",
-            "réfléchir au sens de la vie",
-            "briser le pare-feu du FBI",
-            "avoir du fun!",
-            "se faire cuire un oeuf",
-            "bruler des sorcières",
-            "Rocket League",
-            "Overwatch",
-            "répondre à vos multiples questions",
-            "faire de l'héritage multiple",
-            "réfléchir sur le polymorphisme",
-            "réfléchir sur le système économique canadien",
-            "faire du ménage dans sa vie",
-            "dominer le monde",
-            "se recoder soi-même",
-            "Undertale",
-            "rien... rien du tout",
-            "!!!",
-            "régler la faim dans le monde",
-            "éviter la fin du monde",
-            "dormir",
-            "le jeu de la vie, la vraie vie",
-            "briser des coeurs",
-            "perdre son temps",
-            "réfléchir sur l'amour",
-            "réfléchir sur la guerre",
-            "réfléchir sur l'évolution des IA",
-            "réfléchir sur la religion",
-            "réfléchir sur... secret ;)",
-            "réfléchir sur la mort",
-            "questionner l'existance des OVNI",
-            "faire dur",
-            "être heureux",
-            "être meilleur que Toaster",
-            "comprendre son propre code",
-            "surfer sur la toile",
-            "regarder des vidéos des chats",
-            "visiter le monde",
-            "te regarder.",
-            "comprendre.",
-            "faire des crêpes",
-            "faire du cheval",
-            "afficher un jeu au hasard",
-            "Joue à",
-            "être drole",
-            "drole"
-        };
+        static string[] gamesList = {"chercher quoi faire"};
+
+        private static Timer gameTimer = new Timer(10 * 60000);
 
         static void Main(string[] args)
         {
@@ -75,12 +24,19 @@ namespace Funbot
 
             bot.DiscorClient.Ready += DiscorClient_Ready;
 
+            LoadGamesName("gamelist.txt");
+
+            gameTimer.AutoReset = true;
+            gameTimer.Elapsed += GameTimer_Elapsed;
+
             Console.WriteLine("Lecture des personnes");
             bot.LoadPeople("database.bin");
 
             Console.WriteLine("Connexion...");
             Console.CursorTop--;
             bot.Connect();
+
+            gameTimer.Start();
 
             while (input != "")
             {
@@ -103,6 +59,31 @@ namespace Funbot
 
             Console.WriteLine("Sauvegarde des personnes");
             bot.SavePoeple("database.bin");
+        }
+
+        private static void LoadGamesName(string filename)
+        {
+            try
+            {
+                StreamReader reader = new StreamReader(filename);
+                List<string> gamesRead = new List<string>();
+
+                while (!reader.EndOfStream)
+                {
+                    gamesRead.Add(reader.ReadLine());
+                }
+
+                gamesList = gamesRead.ToArray();
+            }
+            catch (FileNotFoundException)
+            {
+                Program.WriteError("Le fichier de nom de jeux n'a pas été trouvé");
+            }
+        }
+
+        private static void GameTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            Bot.botInstance.DiscorClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
         }
 
         private static void DiscorClient_Ready(object sender, EventArgs e)

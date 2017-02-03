@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.IO;
+using System.Timers;
 
 using Discord;
 using Discord.Commands;
@@ -31,15 +32,18 @@ namespace Funbot
         static Bot()
         {
             botInstance = new Bot();
+            
+            botInstance.CreateCommandsFromClass(typeof(Bot), botInstance);
+        }
 
-            botInstance.client = new DiscordClient(x => { x.LogLevel = LogSeverity.Info; });
-            botInstance.client.UsingCommands(x =>
+        private Bot()
+        {
+            client = new DiscordClient(x => { x.LogLevel = LogSeverity.Info; });
+            client.UsingCommands(x =>
             {
                 x.PrefixChar = '!';
                 x.AllowMentionPrefix = true;
             });
-
-            botInstance.CreateCommandsFromClass(typeof(Bot), botInstance);
         }
 
         public void Connect()
