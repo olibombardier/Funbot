@@ -119,6 +119,12 @@ namespace Funbot
             }
         }
 
+        [Command("git", "Affiche le lien vers la page github du bot")]
+        static void Git(CommandEventArgs args)
+        {
+            args.Channel.SendMessage("https://github.com/olibombardier/Funbot \nN'hésitez pas à contribuer!");
+        }
+
         [Command("help", "Affiche la liste des commandes disponnible ainsi que leurs instructions", "aide")]
         public void Help(CommandEventArgs args)
         {
