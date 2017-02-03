@@ -11,7 +11,7 @@ namespace Funbot
 {
     static class ServerManagement
     {
-        static readonly string[] colorRoles = { "red", "orange", "yellow", "green", "blue", "purple" };
+        static readonly string[] colorRoles = { "red", "orange", "yellow", "green", "blue", "purple", "cyan" };
 
         [Command("couleur", "Change ta couleur dans le serveur \"Bomb Power\".", "color")]
         [Parameter("colorname", ParameterType.Required)]
