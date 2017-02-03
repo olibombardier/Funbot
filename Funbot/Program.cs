@@ -13,12 +13,13 @@ namespace Funbot
     {
         static void Main(string[] args)
         {
-            Bot bot = new Bot();
+            Bot bot = Bot.botInstance;
             string input = "as";
 
             bot.CreateCommandsFromClass(typeof(Questions));
             bot.CreateCommandsFromClass(typeof(ImageGenerator));
             bot.CreateCommandsFromClass(typeof(Program));
+            bot.CreateCommandsFromClass(typeof(ServerManagement));
 
             Console.WriteLine("Lecture des personnes");
             bot.LoadPeople("database.bin");

@@ -12,6 +12,11 @@ namespace Funbot
     class Bot
     {
         private DiscordClient client;
+        public DiscordClient DiscorClient
+        {
+            get { return client; }
+        }
+
         private List<CommandHelp> commandHelp = new List<CommandHelp>();
 
         private Dictionary<ulong, Person> users = new Dictionary<ulong, Person>();
@@ -21,16 +26,20 @@ namespace Funbot
 
         public static readonly Random rand = new Random((int)DateTime.Now.Ticks);
 
-        public Bot()
+        public static Bot botInstance { get; private set; }
+
+        static Bot()
         {
-            client = new DiscordClient(x => { x.LogLevel = LogSeverity.Info; });
-            client.UsingCommands(x =>
+            botInstance = new Bot();
+
+            botInstance.client = new DiscordClient(x => { x.LogLevel = LogSeverity.Info; });
+            botInstance.client.UsingCommands(x =>
             {
                 x.PrefixChar = '!';
                 x.AllowMentionPrefix = true;
             });
 
-            CreateCommandsFromClass(typeof(Bot), this);
+            botInstance.CreateCommandsFromClass(typeof(Bot), botInstance);
         }
 
         public void Connect()
@@ -379,7 +388,7 @@ namespace Funbot
             {
                 result = GetIdFromMention(Mention);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 noError = false;
             }
