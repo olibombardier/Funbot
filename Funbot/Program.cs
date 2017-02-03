@@ -107,7 +107,7 @@ namespace Funbot
 
         private static void DiscorClient_Ready(object sender, EventArgs e)
         {
-            Bot.botInstance.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
+            Bot.botInstance.DiscorClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
         }
 
         [Command("easteregg", "")]
