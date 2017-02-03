@@ -14,12 +14,11 @@ namespace Funbot
         static void Main(string[] args)
         {
             Bot bot = new Bot();
-            ImageGenerator img = new ImageGenerator();
             string input = "as";
 
-            bot.CreateCommandsFromClass<Questions>();
-            bot.CreateCommandsFromObject(img);
-            bot.CreateCommandsFromClass<Program>();
+            bot.CreateCommandsFromClass(typeof(Questions));
+            bot.CreateCommandsFromClass(typeof(ImageGenerator));
+            bot.CreateCommandsFromClass(typeof(Program));
 
             Console.WriteLine("Lecture des personnes");
             bot.LoadPeople("database.bin");
@@ -61,21 +60,21 @@ namespace Funbot
             Console.ResetColor();
         }
 
-        static void WriteError(string message)
+        public static void WriteError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine(message);
             Console.ResetColor();
         }
 
-        public static void WriteLine(string message, ConsoleColor color)
+        public static void WriteLine(string message, ConsoleColor color = ConsoleColor.White)
         {
             Console.ForegroundColor = color;
             Console.WriteLine(message);
             Console.ResetColor();
         }
 
-        public static void Write(string message, ConsoleColor color)
+        public static void Write(string message, ConsoleColor color = ConsoleColor.White)
         {
             Console.ForegroundColor = color;
             Console.Write(message);

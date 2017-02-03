@@ -30,7 +30,7 @@ namespace Funbot
                 x.AllowMentionPrefix = true;
             });
 
-            CreateCommandsFromObject(this);
+            CreateCommandsFromClass(typeof(Bot), this);
         }
 
         public void Connect()
@@ -44,55 +44,9 @@ namespace Funbot
             client.Disconnect();
         }
 
-        public void CreateCommandsFromClass(Type classType)
+        public void CreateCommandsFromClass(Type classType, object classInstence = null)
         {
-            CommandService commandService = client.GetService<CommandService>();
-
-            foreach (MethodInfo method in classType.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                CommandAttribute command = method.GetCustomAttribute<CommandAttribute>();
-                if (command != null)
-                {
-                    CommandHelp help = new CommandHelp();
-
-                    CommandBuilder builder = commandService.CreateCommand(command.Name);
-                    help.CommandName = command.Name;
-                    help.HelpText = command.HelpText;
-
-                    foreach (string alias in command.Aliases)
-                    {
-                        builder.Alias(alias);
-                    }
-                    help.Aliases = command.Aliases;
-
-                    IEnumerable<ParameterAttribute> paramList = method.GetCustomAttributes<ParameterAttribute>();
-                    foreach (ParameterAttribute param in paramList)
-                    {
-                        builder.Parameter(param.Name, param.Type);
-                    }
-
-                    if (method.IsStatic)
-                    {
-                        builder.Do((Action<CommandEventArgs>)Delegate.CreateDelegate(typeof(Action<CommandEventArgs>), method));
-                        Console.WriteLine("Commend added: {0}.", command.Name);
-
-                        if (method.GetCustomAttribute<HiddenAttribute>() == null)
-                        {
-                            commandHelp.Add(help);
-                        }
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("La comande \"" + command.Name + "\" ne peut pas être utilisée car elle n'est pas statique");
-                        Console.ResetColor();
-                    }
-                }
-            }
-        }
-
-        public void CreateCommandsFromObject(Type classType, object target)
-        {
+            object instence = classInstence;
             CommandService commandService = client.GetService<CommandService>();
 
             foreach (MethodInfo method in classType.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
@@ -122,6 +76,7 @@ namespace Funbot
                     {
                         builder.Do((Action<CommandEventArgs>)Delegate.CreateDelegate(typeof(Action<CommandEventArgs>), method));
                         Console.WriteLine("Commend added: {0}.", command.Name);
+
                         if (method.GetCustomAttribute<HiddenAttribute>() == null)
                         {
                             commandHelp.Add(help);
@@ -129,8 +84,21 @@ namespace Funbot
                     }
                     else
                     {
+                        if(instence == null)
+                        {
+                            try
+                            {
+                                instence = Activator.CreateInstance(classType);
+                            }
+                            catch(Exception e)
+                            {
+                                Program.WriteError("Impossible de créer une instance de \"" + classType.Name + "\". (" + e.Message + ")");
+                            }
+                        }
+
+                        builder.Do((Action<CommandEventArgs>)Delegate.CreateDelegate(typeof(Action<CommandEventArgs>), instence, method));
                         Console.WriteLine("Commend added: {0}.", command.Name);
-                        builder.Do((Action<CommandEventArgs>)Delegate.CreateDelegate(typeof(Action<CommandEventArgs>), target, method));
+
                         if (method.GetCustomAttribute<HiddenAttribute>() == null)
                         {
                             commandHelp.Add(help);

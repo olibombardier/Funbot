@@ -7,11 +7,26 @@ namespace Funbot
     {
         public static void LoadCommandsFromDll(Bot bot, string filename)
         {
-            Assembly DLL = Assembly.LoadFile(filename);
+            Program.Write("Chargement des commandes de \"");
+            Program.Write(filename);
+            Program.WriteLine("\".");
 
-            foreach(Type t in DLL.GetExportedTypes())
+            Assembly DLL = null;
+            try
             {
-                foreach(MethodInfo method in t.GetMethods())
+                DLL = Assembly.LoadFile(filename);
+            }
+            catch (Exception e)
+            {
+                Program.WriteError("Impossible de charger \"" + filename + "\". (" + e.Message + ")");
+            }
+            
+            if(DLL != null)
+            {
+                foreach (Type t in DLL.GetExportedTypes())
+                {
+                    bot.CreateCommandsFromClass(t);
+                }
             }
         }
     }
