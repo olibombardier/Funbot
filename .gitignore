@@ -5,3 +5,5 @@ packages/
 *.xcf
 *.suo
 *.user
+gamelist.txt
+
