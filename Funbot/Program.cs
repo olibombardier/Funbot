@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DSLib.DiscordCommands;
 using System.Timers;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Funbot
 {
@@ -19,6 +20,7 @@ namespace Funbot
             ImageGenerator img = new ImageGenerator();
             string input = "as";
 
+            WriteLine("Ajout des commandes");
             bot.commandService.AddCommands(typeof(Questions), null);
             bot.commandService.AddCommands(typeof(ImageGenerator), img);
             bot.commandService.AddCommands(typeof(Program), null);
@@ -31,30 +33,19 @@ namespace Funbot
             gameTimer.AutoReset = true;
             gameTimer.Elapsed += GameTimer_Elapsed;
 
-            Console.WriteLine("Connexion...");
+            WriteLine("Connexion...");
             Console.CursorTop--;
             bot.Connect();
 
             gameTimer.Start();
 
-            while (input != "")
-            {
-                input = Console.ReadLine();
-                if(input != "")
-                {
-                    try
-                    {
-                        bot.SetGame(input);
-                    }
-                    catch(Exception e)
-                    {
-                        WriteError("Tentative de changer le jeu échouée: " + e.Message);
-                    }
-                }
-            }
+            Console.ReadKey();
 
             bot.Disconnect();
             Console.WriteLine("Fun Bot déconnecté");
+            SaveGamesName("gamelist.txt");
+
+            WriteLine("Fin du programme");
         }
 
         private static void LoadGamesName(string filename)
@@ -64,18 +55,45 @@ namespace Funbot
                 StreamReader reader = new StreamReader(filename);
                 List<string> gamesRead = new List<string>();
 
+                WriteLine("Lecture des nom de jeux");
+
                 while (!reader.EndOfStream)
                 {
                     gamesRead.Add(reader.ReadLine());
                 }
 
                 gamesList = gamesRead.ToArray();
+                reader.Close();
             }
             catch (FileNotFoundException)
             {
                 Program.WriteError("Le fichier de nom de jeux n'a pas été trouvé");
             }
         }
+
+        private static void SaveGamesName(string filename)
+        {
+            StreamWriter writer;
+            try
+            {
+                using (writer = new StreamWriter(filename, false))
+                {
+                    WriteLine("Écriture des noms de jeux");
+                    foreach (string name in gamesList)
+                        {
+                            if (name != "")
+                            {
+                                writer.WriteLine(name);
+                            }
+                        }
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Program.WriteError("Le fichier de nom de jeux n'a pas été trouvé");
+            }
+        }
+
 
         private static void GameTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -84,7 +102,26 @@ namespace Funbot
 
         private static void DiscorClient_Ready(object sender, EventArgs e)
         {
+            Console.WriteLine("Le bot est prêt à l'utilisation!");
             Bot.botInstance.DiscordClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
+        }
+
+        [Command("addgame")]
+        [CommandHelp("Ajoute un jeu auquel le bot peux jouer", "")]
+        [CommandParam(0, "gamename", true)]
+        static async Task AddGame(CommandEventArgs args)
+        {
+            string gamename = args.GetArg("gamename");
+            
+            WriteLine(args.User.Name + " veux ajouter le jeu " + gamename);
+
+            if (!gamesList.Contains(gamename))
+            {
+                string[] newGameList = new string[gamesList.Length + 1];
+                gamesList.CopyTo(newGameList, 0);
+                newGameList[gamesList.Length] = gamename;
+                gamesList = newGameList;
+            }
         }
 
         [Command("easteregg")]

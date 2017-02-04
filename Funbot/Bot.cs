@@ -34,6 +34,7 @@ namespace Funbot
         {
             botInstance = new Bot();
 
+            botInstance.commandService.AddHelpCommand();
             botInstance.commandService.AddCommands(typeof(Bot), botInstance);
         }
 
@@ -48,7 +49,7 @@ namespace Funbot
         public void Connect()
         {
             client.Connect("MjcwNjMyMTc2MjI2MTQwMTcx.C2KAJA.bbAC6ZdH_i-L7yBWhrQ8eyjxX0M", TokenType.Bot);
-            Console.WriteLine("Fun Bot connecté");
+            Program.WriteLine("Fun Bot connecté");
         }
 
         public void Disconnect()
@@ -56,13 +57,14 @@ namespace Funbot
             client.Disconnect();
         }
 
-        [Command("git", "Affiche le lien vers la page github du bot")]
+        [Command("git")]
+        [CommandHelp("Affiche le lien vers le dépot github du bot", "")]
         static async Task Git(CommandEventArgs args)
         {
             await args.Channel.SendMessage("https://github.com/olibombardier/Funbot \nN'hésitez pas à contribuer!");
         }
 
-        [Command("help", "Affiche la liste des commandes disponnible ainsi que leurs instructions", "aide")]
+        /*[Command("help", "Affiche la liste des commandes disponnible ainsi que leurs instructions", "aide")]
         public async Task Help(CommandEventArgs args)
         {
             StringBuilder builder = new StringBuilder();
@@ -101,15 +103,17 @@ namespace Funbot
             }
 
             await args.User.PrivateChannel.SendMessage(builder.ToString());
-        }
+        }*/
 
-        [Command("hello", "Dites bonjour à Fun Bot", "salut", "bonjour", "yo", "allo", "bonsoir", "hey")]
+        [Command("hello", "salut", "bonjour", "yo", "allo", "bonsoir", "hey", "coucou", "hola")]
+        [CommandHelp("Dites bonjour à Fun Bot", "")]
         static async Task Hello(CommandEventArgs args)
         {
             await args.Channel.SendMessage(answerHello[rand.Next(answerHello.Length)]);
         }
 
-        [Command("bye", "Dites au revoir à Fun Bot", "byebye")]
+        [Command("bye", "byebye")]
+        [CommandHelp("Dites au revoir à Fun Bot", "")]
         [CommandParam(0, "bye", true, true)]
         static async Task Bye(CommandEventArgs args)
         {
