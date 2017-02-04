@@ -6,4 +6,5 @@ packages/
 *.suo
 *.user
 gamelist.txt
+roastlist.txt
 

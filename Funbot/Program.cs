@@ -5,14 +5,19 @@ using DSLib.DiscordCommands;
 using System.Timers;
 using System.Threading.Tasks;
 using System.Linq;
+using Discord;
 
 namespace Funbot
 {
     class Program
     {
         static string[] gamesList = {"chercher quoi faire"};
+        static string[] roastsList = { "{0}... {0}... désolé, j'ai pas d'idée de roast..." };
 
-        private static Timer gameTimer = new Timer(45 * 60000);
+        const string gameFileName = "gamelist.txt";
+        const string roastFileName = "roastlist.txt";
+
+        private static Timer gameTimer = new Timer(30 * 60000);
 
         static void Main(string[] args)
         {
@@ -28,7 +33,11 @@ namespace Funbot
 
             bot.DiscordClient.Ready += DiscorClient_Ready;
 
-            LoadGamesName("gamelist.txt");
+            WriteLine("Lecture des jeux");
+            gamesList = LoadLines(gameFileName);
+            
+            WriteLine("Lecture des roasts");
+            roastsList = LoadLines(roastFileName);
 
             gameTimer.AutoReset = true;
             gameTimer.Elapsed += GameTimer_Elapsed;
@@ -43,43 +52,41 @@ namespace Funbot
 
             bot.Disconnect();
             Console.WriteLine("Fun Bot déconnecté");
-            SaveGamesName("gamelist.txt");
 
             WriteLine("Fin du programme");
         }
 
-        private static void LoadGamesName(string filename)
+        private static string[] LoadLines(string filename)
         {
+            List<string> linesRead = new List<string>();
+
             try
             {
                 StreamReader reader = new StreamReader(filename);
-                List<string> gamesRead = new List<string>();
-
-                WriteLine("Lecture des nom de jeux");
 
                 while (!reader.EndOfStream)
                 {
-                    gamesRead.Add(reader.ReadLine());
+                    linesRead.Add(reader.ReadLine());
                 }
-
-                gamesList = gamesRead.ToArray();
+                
                 reader.Close();
             }
             catch (FileNotFoundException)
             {
-                Program.WriteError("Le fichier de nom de jeux n'a pas été trouvé");
+                WriteError("Le fichier \"" + filename + "\" n'a pas été trouvé");
             }
+
+            return linesRead.ToArray();
         }
 
-        private static void SaveGamesName(string filename)
+        private static void SaveLines(string filename, string[] lines)
         {
             StreamWriter writer;
             try
             {
                 using (writer = new StreamWriter(filename, false))
                 {
-                    WriteLine("Écriture des noms de jeux");
-                    foreach (string name in gamesList)
+                    foreach (string name in lines)
                         {
                             if (name != "")
                             {
@@ -90,10 +97,26 @@ namespace Funbot
             }
             catch (FileNotFoundException)
             {
-                Program.WriteError("Le fichier de nom de jeux n'a pas été trouvé");
+                WriteError("Le fichier \"" + filename + "\" n'a pas été trouvé");
             }
         }
 
+        private static void SaveLine(string filename, string line)
+        {
+            StreamWriter writer;
+            try
+            {
+                using (writer = new StreamWriter(filename, true))
+                {
+                    
+                    writer.WriteLine(line);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                WriteError("Le fichier \"" + filename + "\" n'a pas été trouvé");
+            }
+        }
 
         private static void GameTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
@@ -121,7 +144,60 @@ namespace Funbot
                 gamesList.CopyTo(newGameList, 0);
                 newGameList[gamesList.Length] = gamename;
                 gamesList = newGameList;
+
+                SaveLine(gameFileName, gamename);
             }
+        }
+
+        [Command("addroast")]
+        [CommandHelp("Ajoute un roast au bot", "")]
+        [CommandParam(0, "roast", true)]
+        static async Task AddRoast(CommandEventArgs args)
+        {
+            string roast = args.GetArg("roast");
+
+            WriteLine("Roast ajouté");
+
+            if (!gamesList.Contains(roast))
+            {
+                string[] newRoastList = new string[roastsList.Length + 1];
+                roastsList.CopyTo(newRoastList, 0);
+                newRoastList[roastsList.Length] = roast;
+                roastsList = newRoastList;
+
+                SaveLine(roastFileName, roast);
+                await args.Channel.SendMessage(String.Format("Le roast " + roast + " a été ajouté", "(...)"));
+            }
+        }
+
+        [Command("roast")]
+        [CommandHelp("Roast une personne, spécifiez la personne avec une mention", "")]
+        [CommandParam(0, "target", true, true)]
+        static async Task Roast(CommandEventArgs args)
+        {
+            string target = args.GetArg("target");
+            string targetName = "qqn";
+
+            if(target == null)
+            {
+                User[] users = args.Server.Users.Where((u) => (u.Status != UserStatus.Offline)).ToArray();
+                targetName = users[Bot.rand.Next(users.Length)].Name;
+            }
+            else
+            {
+                ulong id = 0;
+                if(Bot.TryGetIdFromMention(target, ref id))
+                {
+                    targetName = args.Server.GetUser(id).Name;
+                }
+                else
+                {
+                    targetName = target;
+                }
+            }
+
+            string roast = String.Format(roastsList[Bot.rand.Next(roastsList.Length)], targetName);
+            await args.Channel.SendMessage(roast);
         }
 
         [Command("easteregg")]
