@@ -99,6 +99,28 @@ namespace Funbot
             Console.WriteLine(args.GetArg("message"));
         }
 
+        /// <summary>
+        /// Get the name used by the user on the server
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static string getUserName(User user)
+        {
+            string result = user.Nickname;
+
+            Console.WriteLine("Nick {0}", result);
+
+            if (result == null)
+            {
+                result = user.Name;
+            }
+
+
+            Console.WriteLine("result {0} \n", result);
+
+            return result;
+        }
+
         public static ulong GetIdFromMention(string Mention)
         {
             ulong result = 0;

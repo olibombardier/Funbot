@@ -204,14 +204,14 @@ namespace Funbot
             if(target == null)
             {
                 User[] users = args.Server.Users.Where((u) => (u.Status != UserStatus.Offline)).ToArray();
-                targetName = users[Bot.rand.Next(users.Length)].Name;
+                targetName = Bot.getUserName(users[Bot.rand.Next(users.Length)]);
             }
             else
             {
                 ulong id = 0;
                 if(Bot.TryGetIdFromMention(target, ref id))
                 {
-                    targetName = args.Server.GetUser(id).Name;
+                    targetName = Bot.getUserName(args.Server.GetUser(id));
                 }
                 else
                 {
@@ -220,7 +220,7 @@ namespace Funbot
             }
 
             string roast = String.Format(roastsList[Bot.rand.Next(roastsList.Length)], targetName);
-            await args.Channel.SendMessage(roast);
+            await args.Channel.SendMessage("-" + roast);
         }
 
         [Command("stats", "stat")]
