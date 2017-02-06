@@ -33,6 +33,7 @@ namespace Funbot
             bot.commandService.AddCommands(typeof(ServerManagement), null);
 
             bot.DiscordClient.Ready += DiscorClient_Ready;
+            bot.commandService.CommandException += OnCommandException;
 
             WriteLine("Lecture des jeux");
             gamesList = LoadLines(gameFileName);
@@ -55,6 +56,28 @@ namespace Funbot
             Console.WriteLine("Fun Bot déconnecté");
 
             WriteLine("Fin du programme");
+        }
+
+        private static void OnCommandException(CommandExceptionEventArgs e)
+        {
+            Exception ex = e.Exception;
+            CommandEventArgs command = e.Command;
+
+            DateTime now = DateTime.Now;
+            string nowString = "[" + now.ToShortTimeString() + "]";
+
+            WriteError(
+                nowString +
+                "An error occured in the command \"" + 
+                command.Message.RawText +
+                "\" by " + 
+                command.User.Name + ": ");
+
+            WriteError(e.Exception.ToString());
+            WriteError("In channel " + command.Channel.Name);
+            WriteError("");
+
+            command.Channel.SendMessage("```Une erreur s'est produite à l'exécution de la commande.```");
         }
 
         private static string[] LoadLines(string filename)
