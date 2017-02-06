@@ -24,7 +24,6 @@ namespace Funbot
         {
             Bot bot = Bot.botInstance;
             ImageGenerator img = new ImageGenerator();
-            string input = "as";
 
             WriteLine("Ajout des commandes");
             bot.commandService.AddCommands(typeof(Questions), null);
@@ -149,7 +148,7 @@ namespace Funbot
 
         private static void DiscorClient_Ready(object sender, EventArgs e)
         {
-            Console.WriteLine("Le bot est prêt à l'utilisation!");
+            WriteLine("Le bot est prêt à l'utilisation!");
             Bot.botInstance.DiscordClient.SetGame(gamesList[Bot.rand.Next(gamesList.Length)]);
         }
 
@@ -174,7 +173,7 @@ namespace Funbot
         }
 
         [Command("addroast")]
-        [CommandHelp("Ajoute un roast au bot", "")]
+        [CommandHelp("Ajoute un roast au bot", "Usage: !addroast [roast]\n {0} sera remplacé pas le nom de la personne roastée")]
         [CommandParam(0, "roast", true)]
         static async Task AddRoast(CommandEventArgs args)
         {
@@ -195,8 +194,8 @@ namespace Funbot
         }
 
         [Command("roast")]
-        [CommandHelp("Roast une personne, spécifiez la personne avec une mention", "")]
-        [CommandParam(0, "target", true, true)]
+        [CommandHelp("Roast une personne, spécifiez la personne avec une mention ou par un nom quelconque", "")]
+        [CommandParam(0, "cible", true, true)]
         static async Task Roast(CommandEventArgs args)
         {
             string target = args.GetArg("target");
@@ -225,7 +224,7 @@ namespace Funbot
         }
 
         [Command("stats", "stat")]
-        [CommandHelp("Afiiche certaines statistiques du bot", "")]
+        [CommandHelp("Affiche certaines statistiques du bot", "")]
         static async Task Stats(CommandEventArgs args)
         {
             StringBuilder builder = new StringBuilder("```");
