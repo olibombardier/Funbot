@@ -6,6 +6,7 @@ using System.Timers;
 using System.Threading.Tasks;
 using System.Linq;
 using Discord;
+using System.Text;
 
 namespace Funbot
 {
@@ -198,6 +199,22 @@ namespace Funbot
 
             string roast = String.Format(roastsList[Bot.rand.Next(roastsList.Length)], targetName);
             await args.Channel.SendMessage(roast);
+        }
+
+        [Command("stats", "stat")]
+        [CommandHelp("Afiiche certaines statistiques du bot", "")]
+        static async Task Stats(CommandEventArgs args)
+        {
+            StringBuilder builder = new StringBuilder("```");
+
+            builder.Append("Nombre de jeux: ");
+            builder.AppendLine(gamesList.Length.ToString());
+
+            builder.Append("Nombre de roasts: ");
+            builder.AppendLine(roastsList.Length.ToString());
+
+            builder.Append("```");
+            await args.Channel.SendMessage(builder.ToString());
         }
 
         [Command("easteregg")]
