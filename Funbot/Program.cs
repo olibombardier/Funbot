@@ -187,8 +187,6 @@ namespace Funbot
         {
             string roast = args.GetArg("roast");
 
-            WriteLine("Roast ajouté");
-
             if (!gamesList.Contains(roast))
             {
                 string[] newRoastList = new string[roastsList.Length + 1];
@@ -212,8 +210,15 @@ namespace Funbot
             
             if(target == null)
             {
-                User[] users = args.Server.Users.Where((u) => (u.Status != UserStatus.Offline)).ToArray();
-                targetName = Bot.getUserName(users[Bot.rand.Next(users.Length)]);
+                if (args.Channel.IsPrivate)
+                {
+                    targetName = args.User.Name;
+                }
+                else
+                {
+                    User[] users = args.Server.Users.Where((u) => (u.Status != UserStatus.Offline)).ToArray();
+                    targetName = Bot.getUserName(users[Bot.rand.Next(users.Length)]);
+                }
             }
             else
             {
@@ -230,7 +235,7 @@ namespace Funbot
             int chosenRoast = Bot.rand.Next(roastsList.Length);
             string roast = String.Format(roastsList[chosenRoast], targetName);
             BotDebug.OnRoast(chosenRoast);
-            await args.Channel.SendMessage("-" + roast);
+            await args.Channel.SendMessage(roast);
         }
 
         [Command("stats", "stat")]

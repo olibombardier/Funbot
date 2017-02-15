@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Net;
+
 
 using Discord;
 using DSLib.DiscordCommands;
@@ -12,7 +14,7 @@ namespace Funbot
 {
     class BotDebug
     {
-        private static StreamWriter logWriter;
+        private static object logLock = new object();
 
         private const ulong MyId = 202154315765383169;
 
@@ -23,18 +25,11 @@ namespace Funbot
 
         public static void InitDebug()
         {
-            logWriter = new StreamWriter(logFileName, true);
-
             ReadRoastStats();
         }
 
         public static void StopDebug()
         {
-            if (logWriter != null)
-            {
-                logWriter.Close();
-            }
-
             SaveRoastStats();
         }
 
@@ -101,9 +96,10 @@ namespace Funbot
 
             Program.WriteLine(builder.ToString(), consoleColor);
 
-            if (logWriter != null)
+
+            lock (logLock)
             {
-                lock (logWriter)
+                using (StreamWriter logWriter = new StreamWriter(logFileName, true))
                 {
                     logWriter.WriteLine(builder.ToString());
                 }
@@ -141,6 +137,46 @@ namespace Funbot
             }
         }
 
+        [Command("updateGames")]
+        public async static Task UpdateGames(CommandEventArgs args)
+        {
+            if (args.User.Id == MyId)
+            {
+                Message.Attachment[] attachments = args.Message.Attachments;
+                if (attachments.Length == 1)
+                {
+                    WebClient webClient = new WebClient();
+
+                    await Task.Run(
+                        () => {
+                            webClient.DownloadFile(attachments[0].Url, Program.gameFileName);
+                        });
+
+                    await args.Channel.SendMessage("Jeux mis à jour");
+                }
+            }
+        }
+
+        [Command("updateroasts")]
+        public async static Task UpdateRoasts(CommandEventArgs args)
+        {
+            if (args.User.Id == MyId)
+            {
+                Message.Attachment[] attachments = args.Message.Attachments;
+                if (attachments.Length == 1)
+                {
+                    WebClient webClient = new WebClient();
+
+                    await Task.Run(
+                        () =>
+                        {
+                            webClient.DownloadFile(attachments[0].Url, Program.roastFileName);
+                        });
+                    await args.Channel.SendMessage("Roasts mis à jour");
+                }
+            }
+        }
+
         [Command("getroasts")]
         public async static Task GetRoastList(CommandEventArgs args)
         {
@@ -169,13 +205,25 @@ namespace Funbot
             }
         }
 
+        [Command("clearlog")]
+        public async static Task ClearLog(CommandEventArgs args)
+        {
+            await GetLog(args);
+
+            if(args.User.Id == MyId)
+            {
+                lock (logLock)
+                {
+                    File.Delete(logFileName);
+                }
+            }
+        }
+
         public static void OnRoast(int roastIndex)
         {
             if (roastIndex >= roastStats.Length)
             {
-                int[] newList = new int[roastIndex];
-                roastStats.CopyTo(newList, 0);
-                roastStats = newList;
+                Array.Resize(ref roastStats, roastIndex + 1);
             }
 
             roastStats[roastIndex]++;
