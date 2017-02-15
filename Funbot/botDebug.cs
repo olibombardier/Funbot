@@ -17,12 +17,13 @@ namespace Funbot
         private const ulong MyId = 202154315765383169;
 
         private const string roastStatsFileName = "roastStats.csv";
+        private const string logFileName = "Funbot.log";
 
         private static int[] roastStats = new int[0];
 
         public static void InitDebug()
         {
-            logWriter = new StreamWriter("Funbot.log", true);
+            logWriter = new StreamWriter(logFileName, true);
 
             ReadRoastStats();
         }
@@ -75,7 +76,7 @@ namespace Funbot
                 {
                     foreach (int count in roastStats)
                     {
-                        writer.WriteLine(count);
+                        writer.WriteLine(count.ToString());
                     }
                 }
             }
@@ -96,7 +97,7 @@ namespace Funbot
             builder.Append(logType);
             builder.Append("] ");
 
-            builder.Append(logType);
+            builder.Append(message);
 
             Program.WriteLine(builder.ToString(), consoleColor);
 
@@ -104,7 +105,7 @@ namespace Funbot
             {
                 lock (logWriter)
                 {
-                    logWriter.Write(builder.ToString());
+                    logWriter.WriteLine(builder.ToString());
                 }
             }
         }
@@ -141,11 +142,30 @@ namespace Funbot
         }
 
         [Command("getroasts")]
-        public async static Task GetGameList(CommandEventArgs args)
+        public async static Task GetRoastList(CommandEventArgs args)
         {
             if (args.User.Id == MyId)
             {
                 await args.Channel.SendFile(Program.roastFileName);
+            }
+        }
+
+        [Command("getstats")]
+        public async static Task GetRoastStats(CommandEventArgs args)
+        {
+            SaveRoastStats();
+            if (args.User.Id == MyId)
+            {
+                await args.Channel.SendFile(roastStatsFileName);
+            }
+        }
+
+        [Command("getlog")]
+        public async static Task GetLog(CommandEventArgs args)
+        {
+            if (args.User.Id == MyId)
+            {
+                await args.Channel.SendFile(logFileName);
             }
         }
 

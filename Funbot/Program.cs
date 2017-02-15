@@ -24,8 +24,10 @@ namespace Funbot
         {
             Bot bot = Bot.botInstance;
             ImageGenerator img = new ImageGenerator();
+            BotDebug.InitDebug();
 
             BotDebug.Log("Ajout des commandes", "Init");
+            bot.commandService.AddCommands(typeof(BotDebug), null);
             bot.commandService.AddCommands(typeof(Questions), null);
             bot.commandService.AddCommands(typeof(ImageGenerator), img);
             bot.commandService.AddCommands(typeof(Program), null);
@@ -55,6 +57,7 @@ namespace Funbot
             bot.Disconnect();
             BotDebug.Log("Fun Bot déconnecté");
 
+            BotDebug.StopDebug();
             WriteLine("Fin du programme");
         }
 
@@ -163,8 +166,6 @@ namespace Funbot
         static async Task AddGame(CommandEventArgs args)
         {
             string gamename = args.GetArg("gamename");
-            
-            WriteLine(args.User.Name + " veux ajouter le jeu " + gamename);
 
             if (!gamesList.Contains(gamename))
             {
@@ -174,7 +175,7 @@ namespace Funbot
                 gamesList = newGameList;
 
                 SaveLine(gameFileName, gamename);
-                await args.Channel.SendMessage("Le jeu " + gamename + "à été ajouté.");
+                await args.Channel.SendMessage("Le jeu " + gamename + " à été ajouté.");
                 BotDebug.Log("A game has been added (" + gamename + ")");
             }
         }
@@ -209,8 +210,6 @@ namespace Funbot
             string target = args.GetArg("target");
             string targetName = "qqn";
             
-            WriteLine(target == null ? target : "null", ConsoleColor.Magenta);
-
             if(target == null)
             {
                 User[] users = args.Server.Users.Where((u) => (u.Status != UserStatus.Offline)).ToArray();
