@@ -40,7 +40,10 @@ namespace Funbot
 
         private Bot()
         {
-            client = new DiscordClient(x => { x.LogLevel = LogSeverity.Info; });
+            client = new DiscordClient(
+                x => { x.LogLevel = LogSeverity.Info;
+                x.LogHandler = BotDebug.OnDiscordLog;
+            });
             commandService = client.UsingCommands();
             commandService.CommandPrefixes.Add("!", null);
             commandService.CommandPrefixes.Add("", (args) => args.Channel.IsPrivate);

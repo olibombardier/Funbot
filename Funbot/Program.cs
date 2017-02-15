@@ -15,8 +15,8 @@ namespace Funbot
         static string[] gamesList = {"chercher quoi faire"};
         static string[] roastsList = { "{0}... {0}... désolé, j'ai pas d'idée de roast..." };
 
-        const string gameFileName = "gamelist.txt";
-        const string roastFileName = "roastlist.txt";
+        public const string gameFileName = "gamelist.txt";
+        public const string roastFileName = "roastlist.txt";
 
         private static Timer gameTimer = new Timer(30 * 60000);
 
@@ -25,7 +25,7 @@ namespace Funbot
             Bot bot = Bot.botInstance;
             ImageGenerator img = new ImageGenerator();
 
-            WriteLine("Ajout des commandes");
+            BotDebug.Log("Ajout des commandes", "Init");
             bot.commandService.AddCommands(typeof(Questions), null);
             bot.commandService.AddCommands(typeof(ImageGenerator), img);
             bot.commandService.AddCommands(typeof(Program), null);
@@ -34,10 +34,11 @@ namespace Funbot
             bot.DiscordClient.Ready += DiscorClient_Ready;
             bot.commandService.CommandException += OnCommandException;
 
-            WriteLine("Lecture des jeux");
+
+            BotDebug.Log("Lecture des jeux", "Init");
             gamesList = LoadLines(gameFileName);
             
-            WriteLine("Lecture des roasts");
+            BotDebug.Log("Lecture des roasts");
             roastsList = LoadLines(roastFileName);
 
             gameTimer.AutoReset = true;
@@ -52,7 +53,7 @@ namespace Funbot
             Console.ReadKey();
 
             bot.Disconnect();
-            Console.WriteLine("Fun Bot déconnecté");
+            BotDebug.Log("Fun Bot déconnecté");
 
             WriteLine("Fin du programme");
         }
@@ -65,16 +66,20 @@ namespace Funbot
             DateTime now = DateTime.Now;
             string nowString = "[" + now.ToShortTimeString() + "]";
 
-            WriteError(
+            StringBuilder messageBuilder = new StringBuilder();
+
+            messageBuilder.Append(
                 nowString +
                 "An error occured in the command \"" + 
                 command.Message.RawText +
                 "\" by " + 
                 command.User.Name + ": ");
 
-            WriteError(e.Exception.ToString());
-            WriteError("In channel " + command.Channel.Name);
-            WriteError("");
+            messageBuilder.Append(e.Exception.ToString());
+            messageBuilder.Append("In channel " + command.Channel.Name);
+            messageBuilder.Append("");
+
+            BotDebug.Log(messageBuilder.ToString(), "Error", ConsoleColor.Red);
 
             command.Channel.SendMessage("```Une erreur s'est produite à l'exécution de la commande.```");
         }
@@ -96,7 +101,7 @@ namespace Funbot
             }
             catch (FileNotFoundException)
             {
-                WriteError("Le fichier \"" + filename + "\" n'a pas été trouvé");
+                BotDebug.Log("Le fichier \"" + filename + "\" n'a pas été trouvé", "FileError", ConsoleColor.Red);
             }
 
             return linesRead.ToArray();
@@ -120,7 +125,7 @@ namespace Funbot
             }
             catch (FileNotFoundException)
             {
-                WriteError("Le fichier \"" + filename + "\" n'a pas été trouvé");
+                BotDebug.Log("Le fichier \"" + filename + "\" n'a pas été trouvé", "FileError", ConsoleColor.Red);
             }
         }
 
@@ -137,7 +142,7 @@ namespace Funbot
             }
             catch (FileNotFoundException)
             {
-                WriteError("Le fichier \"" + filename + "\" n'a pas été trouvé");
+                BotDebug.Log("Le fichier \"" + filename + "\" n'a pas été trouvé", "FileError", ConsoleColor.Red);
             }
         }
 
@@ -169,6 +174,8 @@ namespace Funbot
                 gamesList = newGameList;
 
                 SaveLine(gameFileName, gamename);
+                await args.Channel.SendMessage("Le jeu " + gamename + "à été ajouté.");
+                BotDebug.Log("A game has been added (" + gamename + ")");
             }
         }
 
@@ -190,6 +197,7 @@ namespace Funbot
 
                 SaveLine(roastFileName, roast);
                 await args.Channel.SendMessage(String.Format("Le roast " + roast + " a été ajouté", "(...)"));
+                BotDebug.Log("A roast has been added (" + roast + ")");
             }
         }
 
@@ -200,6 +208,8 @@ namespace Funbot
         {
             string target = args.GetArg("target");
             string targetName = "qqn";
+            
+            WriteLine(target == null ? target : "null", ConsoleColor.Magenta);
 
             if(target == null)
             {
@@ -218,8 +228,9 @@ namespace Funbot
                     targetName = target;
                 }
             }
-
-            string roast = String.Format(roastsList[Bot.rand.Next(roastsList.Length)], targetName);
+            int chosenRoast = Bot.rand.Next(roastsList.Length);
+            string roast = String.Format(roastsList[chosenRoast], targetName);
+            BotDebug.OnRoast(chosenRoast);
             await args.Channel.SendMessage("-" + roast);
         }
 
