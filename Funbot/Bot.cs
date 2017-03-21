@@ -46,12 +46,21 @@ namespace Funbot
             });
             commandService = client.UsingCommands();
             commandService.CommandPrefixes.Add("!", null);
-            commandService.CommandPrefixes.Add("", (args) => args.Channel.IsPrivate);
+            commandService.CommandPrefixes.Add("", (args) => args.Channel.IsPrivate ||
+                                                             args.Channel.Id == 272031256282267658);
         }
 
         public void Connect()
         {
-            client.Connect("MjcwNjMyMTc2MjI2MTQwMTcx.C2KAJA.bbAC6ZdH_i-L7yBWhrQ8eyjxX0M", TokenType.Bot);
+            string botToken = "";
+
+            using (StreamReader reader = new StreamReader("FunBotToken.txt"))
+            {
+                botToken = reader.ReadLine();
+                botToken.TrimEnd();
+            }
+
+            client.Connect(botToken, TokenType.Bot);
             Program.WriteLine("Fun Bot connecté");
         }
 

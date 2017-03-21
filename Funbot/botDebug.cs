@@ -14,6 +14,10 @@ namespace Funbot
 {
     class BotDebug
     {
+        public delegate void ListChangedHandler();
+        public static event ListChangedHandler GamesChanged;
+        public static event ListChangedHandler RoastsChanged;
+
         private static object logLock = new object();
 
         private const ulong MyId = 202154315765383169;
@@ -31,6 +35,14 @@ namespace Funbot
         public static void StopDebug()
         {
             SaveRoastStats();
+
+            lock (logLock)
+            {
+                using (StreamWriter logWriter = new StreamWriter(logFileName, true))
+                {
+                    logWriter.WriteLine("");
+                }
+            }
         }
 
         public static void ReadRoastStats()
@@ -153,6 +165,11 @@ namespace Funbot
                         });
 
                     await args.Channel.SendMessage("Jeux mis à jour");
+
+                    if (GamesChanged != null)
+                    {
+                        GamesChanged();
+                    }
                 }
             }
         }
@@ -173,6 +190,11 @@ namespace Funbot
                             webClient.DownloadFile(attachments[0].Url, Program.roastFileName);
                         });
                     await args.Channel.SendMessage("Roasts mis à jour");
+
+                    if (RoastsChanged != null)
+                    {
+                        RoastsChanged();
+                    }
                 }
             }
         }

@@ -7,4 +7,5 @@ packages/
 *.user
 gamelist.txt
 roastlist.txt
+FunBotToken.txt
 

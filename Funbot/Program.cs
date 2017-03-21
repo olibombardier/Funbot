@@ -26,6 +26,9 @@ namespace Funbot
             ImageGenerator img = new ImageGenerator();
             BotDebug.InitDebug();
 
+            BotDebug.GamesChanged += BotDebug_GamesChangedEvent;
+            BotDebug.RoastsChanged += BotDebug_RoastsChangedEvent;
+
             BotDebug.Log("Ajout des commandes", "Init");
             bot.commandService.AddCommands(typeof(BotDebug), null);
             bot.commandService.AddCommands(typeof(Questions), null);
@@ -59,6 +62,18 @@ namespace Funbot
 
             BotDebug.StopDebug();
             WriteLine("Fin du programme");
+        }
+
+        static void BotDebug_RoastsChangedEvent()
+        {
+            BotDebug.Log("Lecture des nouveau roast roasts");
+            roastsList = LoadLines(roastFileName);
+        }
+
+        static void BotDebug_GamesChangedEvent()
+        {
+            BotDebug.Log("Lecture des nouveau jeux");
+            gamesList = LoadLines(gameFileName);
         }
 
         private static void OnCommandException(CommandExceptionEventArgs e)
@@ -205,7 +220,7 @@ namespace Funbot
         [CommandParam(0, "cible", true, true)]
         static async Task Roast(CommandEventArgs args)
         {
-            string target = args.GetArg("target");
+            string target = args.GetArg("cible");
             string targetName = "qqn";
             
             if(target == null)
