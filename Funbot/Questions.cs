@@ -13,7 +13,7 @@ namespace Funbot
         static readonly string[] normalAnswer = { "Oui, sans aucun doutes!", "Oui, probablement", "Oui", "Oui", "Non, c'est impossible", "non", "non", "Non, c'est peu probable" };
         static readonly string[] unsureAnswer = { "Tout dépend de toi", "Ça dépend...", "Je n'ai pas de réponse décisive... désolé", "Plusieurs possibilités sont probable..." };
 
-        [Command("question", "qu")]
+        [Command("question", "qu", "est-ce")]
         [CommandHelp("Posez un question se répondant par oui ou non", "")]
         [CommandParam(0, "question", true)]
         static async Task Question(CommandEventArgs args)
