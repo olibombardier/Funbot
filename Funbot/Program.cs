@@ -237,6 +237,10 @@ namespace Funbot
                     targetName = Bot.getUserName(users[Bot.rand.Next(users.Length)]);
                 }
             }
+            else if(target.ToLower() == "me")
+            {
+                targetName = args.User.Name;
+            }
             else
             {
                 ulong id = 0;
