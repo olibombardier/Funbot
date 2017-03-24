@@ -63,7 +63,6 @@ namespace Funbot
             }
 
             client.Connect(botToken, TokenType.Bot);
-            Program.WriteLine("Fun Bot connecté");
         }
 
         public void Disconnect()
