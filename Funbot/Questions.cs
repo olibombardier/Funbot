@@ -198,7 +198,7 @@ namespace Funbot
             await args.Channel.SendMessage(Bot.rand.Next(min, max).ToString());
         }
 
-        [Command("choose", "choisit")]
+        [Command("choose", "choisis")]
         [CommandParam(0, "valeurs", true, false)]
         [CommandHelp("Choisit un élément aléatoire dans un liste", "Choisit un élément aléatoire dans un liste, les éléments doivent être séparés par une virgule")]
         static async Task Choose(CommandEventArgs args)
