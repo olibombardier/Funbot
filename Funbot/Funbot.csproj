@@ -94,6 +94,7 @@
     <Compile Include="Bot.cs" />
     <Compile Include="CommandHelp.cs" />
     <Compile Include="BotDebug.cs" />
+    <Compile Include="EnvironementRandom.cs" />
     <Compile Include="ImageGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Questions.cs" />

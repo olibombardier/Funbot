@@ -24,7 +24,7 @@ namespace Funbot
         private static readonly string[] answerHello = { "Salut!", "Hello!", "Coucou!", "Hey!", "Hello!", "Yo!", "Hello! :smile:" };
         private static readonly string[] answerBye = { "Bye!", "Au revoir!", "À la procahine!", "Bye bye!" };
 
-        public static readonly Random rand = new Random((int)DateTime.Now.Ticks);
+        public static readonly EnvironmentRandom rand = new EnvironmentRandom();
 
         public static Bot botInstance { get; private set; }
 
@@ -46,6 +46,8 @@ namespace Funbot
             });
             commandService = client.UsingCommands();
             commandService.CommandPrefixes.Add("!", null);
+            commandService.CommandPrefixes.Add("fb!", null);
+            commandService.CommandPrefixes.Add("funbot!", null);
             commandService.CommandPrefixes.Add("", (args) => args.Channel.IsPrivate ||
                                                              args.Channel.Id == 272031256282267658);
         }
@@ -162,6 +164,23 @@ namespace Funbot
                 noError = false;
             }
             return noError;
+        }
+    }
+
+    class InvalidCommandArgumentException : Exception
+    {
+        public InvalidCommandArgumentException()
+        {
+        }
+
+        public InvalidCommandArgumentException(string message)
+            : base(message)
+        {
+        }
+
+        public InvalidCommandArgumentException(string message, Exception inner)
+            : base(message, inner)
+        {
         }
     }
 }

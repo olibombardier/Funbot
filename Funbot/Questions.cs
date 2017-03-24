@@ -159,5 +159,58 @@ namespace Funbot
             }
             
         }
+
+        [Command("dice", "rand", "dé", "random")]
+        [CommandParam(0, "max", optional: true)]
+        [CommandParam(1, "min", optional: true)]
+        [CommandHelp("Affiche un nombre aléatoire entre min et max (par défaut 1 et 6)", "")]
+        static async Task Dice(CommandEventArgs args)
+        {
+            string maxString = args.GetArg("max");
+            string minString = args.GetArg("min");
+
+            int max = 6;
+            int min = 1;
+
+            if (maxString != null)
+            {
+                if (! int.TryParse(maxString, out max))
+                {
+                    throw new InvalidCommandArgumentException("Le maximum doit être un entier valide");
+                }
+            }
+
+            if (minString != null)
+            {
+                if (!int.TryParse(minString, out min))
+                {
+                    throw new InvalidCommandArgumentException("Le minimum doit être un entier valide");
+                }
+            }
+
+            if (max < min)
+            {
+                int temp = max;
+                max = min;
+                min = temp;
+            }
+
+            await args.Channel.SendMessage(Bot.rand.Next(min, max).ToString());
+        }
+
+        [Command("choose", "choisit")]
+        [CommandParam(0, "valeurs", true, false)]
+        [CommandHelp("Choisit un élément aléatoire dans un liste", "Choisit un élément aléatoire dans un liste, les éléments doivent être séparés par une virgule")]
+        static async Task Choose(CommandEventArgs args)
+        {
+            string[] values = args.GetArg("valeurs").Split(new char[] { ',' });
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                values[i] = values[i].Trim();
+            }
+
+            await args.Channel.SendMessage(values[Bot.rand.Next(values.Length)]);
+        }
     }
 }

@@ -22,6 +22,8 @@ namespace Funbot
 
         static void Main(string[] args)
         {
+            Console.Title = "Funbot";
+
             Bot bot = Bot.botInstance;
             ImageGenerator img = new ImageGenerator();
             BotDebug.InitDebug();
