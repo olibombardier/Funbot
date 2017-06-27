@@ -202,6 +202,12 @@ namespace Funbot
         [CommandParam(0, "roast", true)]
         static async Task AddRoast(CommandEventArgs args)
         {
+            if (args.Server.Id == 210360089318522880ul)
+            {
+                await args.Channel.SendMessage("Commande désactivée dans ce sereur pour en respecter le climat pédagogique ¯\\_(ツ)_/¯");
+                return;
+            }
+
             string roast = args.GetArg("roast");
 
             if (!gamesList.Contains(roast))
@@ -222,6 +228,12 @@ namespace Funbot
         [CommandParam(0, "cible", true, true)]
         static async Task Roast(CommandEventArgs args)
         {
+            if (args.Server.Id == 210360089318522880ul)
+            {
+                await args.Channel.SendMessage("Commande désactivée dans ce sereur pour en respecter le climat pédagogique ¯\\_(ツ)_/¯");
+                return;
+            }
+
             string target = args.GetArg("cible");
             string targetName = "qqn";
             

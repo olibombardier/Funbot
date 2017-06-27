@@ -45,7 +45,7 @@ namespace Funbot
                 x.LogHandler = BotDebug.OnDiscordLog;
             });
             commandService = client.UsingCommands();
-            commandService.CommandPrefixes.Add("!", null);
+            commandService.CommandPrefixes.Add("!", (args) => args.Server == null ? true : args.Server.Id == 202154706032656394ul);
             commandService.CommandPrefixes.Add("fb!", null);
             commandService.CommandPrefixes.Add("funbot!", null);
             commandService.CommandPrefixes.Add("", (args) => args.Channel.IsPrivate ||
