@@ -41,15 +41,16 @@ namespace Funbot
         private Bot()
         {
             client = new DiscordClient(
-                x => { x.LogLevel = LogSeverity.Info;
+                x => { x.LogLevel = LogSeverity.Warning;
                 x.LogHandler = BotDebug.OnDiscordLog;
             });
             commandService = client.UsingCommands();
-            commandService.CommandPrefixes.Add("!", (args) => args.Server == null ? true : args.Server.Id == 202154706032656394ul);
+            commandService.CommandPrefixes.Add("!", (args) => args.Server == null ? true : args.Server.Id != 210360089318522880ul);
             commandService.CommandPrefixes.Add("fb!", null);
             commandService.CommandPrefixes.Add("funbot!", null);
             commandService.CommandPrefixes.Add("", (args) => args.Channel.IsPrivate ||
-                                                             args.Channel.Id == 272031256282267658);
+                                                             args.Channel.Id == 272031256282267658 ||
+                                                             args.Channel.Id == 329057689566969856);
         }
 
         public void Connect()
@@ -77,14 +78,14 @@ namespace Funbot
             await args.Channel.SendMessage("https://github.com/olibombardier/Funbot \nN'hésitez pas à contribuer!");
         }
 
-        [Command("hello", "salut", "bonjour", "yo", "allo", "bonsoir", "hey", "coucou", "hola")]
+        [Command("hello", "salut", "bonjour", "yo", "allo", "bonsoir", "hey", "coucou", "hola", "sup", "bon matin")]
         [CommandHelp("Dites bonjour à Fun Bot", "")]
         static async Task Hello(CommandEventArgs args)
         {
             await args.Channel.SendMessage(answerHello[rand.Next(answerHello.Length)]);
         }
 
-        [Command("bye", "byebye")]
+        [Command("bye", "byebye", "A+", "Au revoir")]
         [CommandHelp("Dites au revoir à Fun Bot", "")]
         [CommandParam(0, "bye", true, true)]
         static async Task Bye(CommandEventArgs args)
